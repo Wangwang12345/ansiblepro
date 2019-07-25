@@ -1,0 +1,95 @@
+---
+- name: install
+  yum:
+    name:
+#      - java-1.8-openjdk
+      - unzip
+    state: installed
+
+#- name: download kafka
+#  get_url:
+#    url: "{{ url }}"
+#    dest: /tmp/kafka_2.12-1.0.0.tgz
+- name: copy  kafka file
+#  copy: src=/root/ansibles/kafka/kafka_2.12-1.0.0.tgz dest=/tmp/kafka_2.12-1.0.0.tgz mode=644 owner=root group=root
+  copy: src=kafka_2.12-1.0.0.tgz dest=/tmp/kafka_2.12-1.0.0.tgz mode=644 owner=root group=root
+
+- name: keep kafka dir clean
+  file:
+    path: /opt/kf
+    state: absent
+
+- name: make kafka dir
+  file:
+    path: /opt/kf
+    state: directory
+    owner: root
+    group: root
+
+- name: unzip file
+  unarchive:
+    src: /tmp/kafka_2.12-1.0.0.tgz
+    dest: /opt/kf
+    mode: 0755
+    remote_src: yes
+    owner: root
+    group: root
+
+- name: link /opt/kf/kafka_2.12-1.0.0 /opt/kf/kafka
+  file: src=/opt/kf/kafka_2.12-1.0.0/ dest=/opt/kf/kafka state=link
+
+- name: delete unuse file
+  file:
+    path: /tmp/kafka_2.12-1.0.0.tgz
+    state: absent
+
+- name: Find /opt/kf directories
+  find:
+    paths: /opt/kf
+    recurse: no
+    file_type: directory
+  registry: kfd
+
+- name: make kafka log directory
+  file:
+    path: /var/log/kafka-log
+    state: directory
+    owner: root
+    group: root
+
+- name: cp server.properties
+  template:
+    src: server.properties
+    dest: /opt/kf/kafka/config/server.properties
+    owner: root
+    group: root
+
+- name: cp jvm.conf to config
+  copy:
+    src: jvm.conf
+    dest: /opt/kf/kafka/config/jvm.conf
+    owner: root
+    group: root
+    mode: 0755
+
+- name: cp kafka to logroate
+  copy:
+    src: kafka
+    dest: /etc/logrotate.d/kafka
+    owner: root
+    group: root
+    mode: 0644
+
+- name: cp kafka.service service
+  copy:
+    src: kafka.service
+    dest: /usr/lib/systemd/system/kafka.service 
+    owner: root
+    group: root
+    mode: 0644
+
+- name: restart kafka
+  service:
+    name=kafka
+    enabled=yes
+    state=restarted

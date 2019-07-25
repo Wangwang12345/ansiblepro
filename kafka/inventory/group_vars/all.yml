@@ -1,0 +1,2 @@
+url: http://archive.apache.org/dist/kafka/1.0.0/kafka_2.12-1.0.0.tgz
+zookeeper: "192.168.19.138:2181"

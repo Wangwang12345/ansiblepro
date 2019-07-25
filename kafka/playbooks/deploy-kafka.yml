@@ -1,0 +1,6 @@
+---
+- name: Deploy kafka server
+  hosts: kafkas
+  become: yes
+  roles:
+    - { role: kafka }

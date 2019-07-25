@@ -1,0 +1,15 @@
+[Unit]
+Description=Apache Kafka server (broker)
+After=network.target  zookeeper.service
+ 
+[Service]
+Type=forking
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/jdk1.8.0_161/bin"
+EnvironmentFile="/opt/kf/kafka/config/jvm.conf"
+User=root
+Group=root
+ExecStart=/opt/kf/kafka/bin/kafka-server-start.sh -daemon /opt/kf/kafka/config/server.properties 
+ExecStop=/opt/kf/kafka/bin/kafka-server-stop.sh
+ 
+[Install]
+WantedBy=multi-user.target
